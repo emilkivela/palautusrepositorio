@@ -74,3 +74,49 @@ class TestKauppa(unittest.TestCase):
         self.kauppa.tilimaksu("pekka", "12345")
 
         self.pankki_mock.tilisiirto.assert_called_with("pekka", 42, "12345", "33333-44455", 5)
+    
+    def test_aloita_asiointi_nollaa_ostoskorin(self):
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with("pekka", 42, "12345", "33333-44455", 5)
+    
+    def test_kauppa_pyytaa_viitenumeron_jokaiselle_maksutapahtumalle(self):
+        viitegeneraattori_mock = Mock(wraps=Viitegeneraattori())
+        kauppa = Kauppa(self.varasto_mock, self.pankki_mock, viitegeneraattori_mock)    
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+        self.assertEqual(viitegeneraattori_mock.uusi.call_count, 1)
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+
+        # tarkistetaan että tässä vaiheessa viitegeneraattorin metodia uusi on kutsuttu kaksi kertaa
+        self.assertEqual(viitegeneraattori_mock.uusi.call_count, 2)
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+
+        # tarkistetaan että tässä vaiheessa viitegeneraattorin metodia uusi on kutsuttu kolme kertaa
+        self.assertEqual(viitegeneraattori_mock.uusi.call_count, 3)
+
+    def test_korista_poistamisen_jalkeen_metodi_tilimaksu_palautetaan_oikeilla_arvoilla(self):
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.lisaa_koriin(2)
+        self.kauppa.poista_korista(1)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with("pekka", 42, "12345", "33333-44455", 3)
+
+
