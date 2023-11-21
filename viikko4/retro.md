@@ -17,5 +17,3 @@ ryhmän jäsenet voivat äänestään mitkä kortit käsitellään yhdessä. Kes
 tarkoituksena on käydä läpi miten seuraavaa sprinttiä voidaan parantaan
 korttien perusteella.
 
-t.6 muutos
-muutos2
