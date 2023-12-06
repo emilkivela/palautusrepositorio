@@ -103,3 +103,4 @@ class Nollaus:
     
     def suorita(self):
         self.sovelluslogiikka.nollaa()
+
